@@ -156,6 +156,6 @@ Wails の `window.go.main.App.GetAPIAddress` は `OnStartup` 完了後に呼べ�
 ```
 
 **次回セッション開始時の推奨手順**:
-1. `/commit` でコミットを作成する
+1. `/commit` でコミットを作成する **済**
 2. Phase 2 の着手ステップを決定する
 3. `wails dev -appargs "D:/work/pumlv-gui/pumlv/examples"` で動作を再確認する
