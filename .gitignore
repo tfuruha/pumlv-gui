@@ -1,0 +1,35 @@
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Wails ビルド成果物
+build/bin/
+
+# フロントエンド
+frontend/node_modules/
+frontend/dist/
+frontend/wailsjs/
+
+# plantuml.js（ビルド時にダウンロードされる大容量ファイル）
+frontend/public/plantuml/
+
+# 開発用ログ
+*.log
+
+# エディタ
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 移植元 pumlv
+pumlv/
