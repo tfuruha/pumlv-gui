@@ -70,7 +70,8 @@ pumlv-gui/
 │
 ├── build/                     # Wails ビルド設定（アイコン等）
 ├── pumlv/                     # 参照用：オリジナル pumlv リポジトリ
-└── Plans/                     # 設計ドキュメント
+├── Docs/                      # 要件定義・基本設計書などの恒久ドキュメント
+└── PlansWalks/                # 実装計画書や作業ログなどの過渡ドキュメント
 ```
 
 ---
@@ -93,7 +94,7 @@ pumlv-gui/
 - **Phase 1 (完了)**: pumlv の内部 HTTP サーバーをそのまま内蔵し、Wails WebView からアクセス
 - **Phase 2 (予定)**: HTTP サーバーを Wails バインディング + Events に置き換え、GUI 機能（DnD、メニュー、設定記憶）を実装
 
-詳細は [Plans/implementation_plan_260715.md](Plans/implementation_plan_260715.md) を参照。
+詳細は [PlansWalks/implementation_plan_260715.md](PlansWalks/implementation_plan_260715.md) を参照。
 
 ---
 
@@ -120,3 +121,21 @@ pumlv-gui/
 1. **`wails dev -appargs` のパス**: バックスラッシュがエスケープされるため、フォワードスラッシュ（`/`）または絶対パスを使用すること
 2. **Phase 1 の HTTP サーバー**: CORS ヘッダー (`Access-Control-Allow-Origin: *`) を付与しているが、`127.0.0.1` のみにバインドしているので安全
 3. **plantuml.js の容量**: 約 4MB。ビルド時に `fetch-plantuml-core.mjs` で自動ダウンロードされる
+
+---
+
+## 主要ライブラリ・外部リンク
+
+開発およびレンダリングで参照される主要なプロジェクト・ライブラリのリンク集です。
+
+* **公式サイト**
+  * **[PlantUML 公式サイト](https://plantuml.com/ja/)**
+* **コア技術**
+  * **[Wails v2](https://wails.io/)** — デスクトップアプリ構築フレームワーク
+  * **[React 19](https://react.dev/)** / **[Tailwind CSS v4](https://tailwindcss.com/)** — UI構築・スタイリング
+* **依存ライブラリ**
+  * **[fsnotify/fsnotify](https://github.com/fsnotify/fsnotify)** — ファイルシステム監視 (Go)
+  * **[shikijs/shiki](https://shiki.style/)** — コードシンタックスハイライト (JS/TS)
+  * **[react-zoom-pan-pinch](https://github.com/prc5/react-zoom-pan-pinch)** — プレビュー操作 (React)
+  * **[plantuml.js](https://github.com/plantuml/plantuml.js)** / **[viz.js](https://github.com/mdaines/viz.js)** — クライアントサイド PlantUML レンダラー
+

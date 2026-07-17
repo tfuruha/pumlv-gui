@@ -2,7 +2,7 @@
 
 > **作成日**: 2026-07-16  
 > **対象**: 次回セッション（Phase 2 着手時）  
-> **前提ドキュメント**: [Plans/implementation_plan_260715.md](../Plans/implementation_plan_260715.md) | [AGENTS.md](../.agents/AGENTS.md)
+> **前提ドキュメント**: [implementation_plan_260715.md](implementation_plan_260715.md) | [AGENTS.md](../AGENTS.md)
 
 ---
 
@@ -116,7 +116,7 @@ Wails の `window.go.main.App.GetAPIAddress` は `OnStartup` 完了後に呼べ�
 
 ## 4. Phase 2 実装方針（設計書からの補足）
 
-詳細は [Plans/implementation_plan_260715.md §5](../Plans/implementation_plan_260715.md) を参照。
+詳細は [implementation_plan_260715.md §5](implementation_plan_260715.md) を参照。
 
 ### Phase 2A: Wails ネイティブ通信への移行（実施順序に依存関係あり）
 

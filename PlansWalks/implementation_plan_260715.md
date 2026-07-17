@@ -87,7 +87,7 @@ pumlv-gui バイナリ (Wails v2)
 d:\work\pumlv-gui\
 ├── .agents/                          # エージェント設定（既存）
 ├── Docs/                             # ドキュメント（既存）
-├── Plans/                            # 計画書（このファイル）
+├── PlansWalks/                       # 計画書（このファイル）
 ├── pumlv/                            # クローン済みの pumlv リポジトリ（参照用）
 │
 ├── main.go                           # [新規] Wails エントリポイント

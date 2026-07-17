@@ -19,6 +19,25 @@ CLI ツール [pumlv](https://github.com/rin2yh/pumlv) を [Wails v2](https://wa
 
 ---
 
+## 技術スタック・使用ライブラリ
+
+本プロジェクトは以下の技術およびライブラリを使用して構築されています。
+
+* **コアフレームワーク**
+  * **[Wails v2](https://wails.io/)** — Go と Webフロントエンド技術を組み合わせた軽量デスクトップアプリフレームワーク。
+* **バックエンド (Go)**
+  * **[fsnotify](https://github.com/fsnotify/fsnotify)** — クロスプラットフォームなファイルシステム監視ライブラリ。
+* **フロントエンド (TypeScript & React)**
+  * **[React 19](https://react.dev/)** — コンポーネント指向 UI ライブラリ。
+  * **[Tailwind CSS v4](https://tailwindcss.com/)** — ユーティリティファーストの CSS フレームワーク。
+  * **[Shiki](https://shiki.style/)** — 高性能なソースコードのシンタックスハイライト。
+  * **[react-zoom-pan-pinch](https://github.com/prc5/react-zoom-pan-pinch)** — プレビューの直感的なズーム・スクロール操作サポート。
+* **レンダリングコア**
+  * **[PlantUML](https://plantuml.com/ja/)** — テキスト記述から UML ダイアグラムを生成するオープンソースツール。
+  * **[plantuml.js](https://github.com/plantuml/plantuml.js)** / **[viz.js](https://github.com/mdaines/viz.js)** — WebView上において、Java や Graphviz をローカルインストールすることなくブラウザのみで SVG レンダリングを行うための JavaScript 実装。
+
+---
+
 ## セットアップ
 
 ### 前提条件
@@ -113,9 +132,9 @@ pumlv-gui/
 │       └── components/
 │
 ├── examples/                # サンプル PlantUML ファイル
-├── Docs/                    # 設計ドキュメント
+├── Docs/                    # 設計ドキュメント（要件定義、基本設計書など）
 │   └── design_document.md
-└── Plans/                   # 実装計画書
+└── PlansWalks/              # 実装計画書や作業プロセスログ
 ```
 
 ---
@@ -142,4 +161,4 @@ Go バックエンドとフロントエンドは HTTP を介さず、Wails ネ�
 
 ## ライセンス
 
-MIT
+このプロジェクトは [MIT ライセンス](LICENSE) のもとで公開されています。詳細は [LICENSE](LICENSE) ファイルをご覧ください。

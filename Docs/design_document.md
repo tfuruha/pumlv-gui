@@ -182,3 +182,23 @@ sequenceDiagram
 | **F3** | 前回フォルダの記憶 | アプリケーション終了時（`shutdown`）およびフォルダ切替時に `~/.pumlv-gui/config.json` へ絶対パスを記録し、次回起動時に自動ロード。 |
 | **F4** | ドラッグ＆ドロップ対応 | Wails の `EnableFileDrop: true` を有効化。`runtime.OnFileDrop` にてドロップされたパスのうち、最初のディレクトリパスを `OpenFolder` する。 |
 | **F5** | メニューバー対応 | Go 側で `menu.NewMenu()` を用いて「ファイル」メニューを定義。「フォルダを開く...」(Ctrl+O) ショートカットキー対応。 |
+
+---
+
+## 7. 使用ライブラリ・外部依存関係
+
+本システムでは、SVG形式のダイアグラム生成およびリアルタイムプレビューを実現するために、以下の外部ライブラリを利用しています。
+
+* **[PlantUML](https://plantuml.com/ja/)**
+  * UMLや各種図をプレーンテキストで記述・生成するためのオープンソースプロジェクト。
+* **[plantuml.js](https://github.com/plantuml/plantuml.js)** / **[viz.js (mdaines/viz.js)](https://github.com/mdaines/viz.js)**
+  * WebView（ブラウザ）上で、JavaやGraphvizのローカル環境なしに単体でPlantUMLのSVGレンダリングを実行するライブラリ。ビルド時に `scripts/fetch-plantuml-core.mjs` を経由して自動的にダウンロードされ、`/public/plantuml/` 配下に配置されます。
+* **[Wails v2 (wailsapp/wails)](https://wails.io/)**
+  * Goで書かれたバックエンドとWebフロントエンドを結合し、単一バイナリのデスクトップGUIアプリケーションとしてパッケージングするフレームワーク。
+* **[fsnotify (fsnotify/fsnotify)](https://github.com/fsnotify/fsnotify)**
+  * Goバックエンドにおいて、監視対象フォルダ内のファイルシステム変更（新規追加、保存、削除等）をプラットフォーム固有のAPIを利用して効率的に検知するライブラリ。
+* **[Shiki (shikijs/shiki)](https://shiki.style/)**
+  * フロントエンド上の `SourceView` にて、選択されたPlantUMLテキストファイルを美しく読みやすいシンタックスハイライトで表示するためのライブラリ。
+* **[react-zoom-pan-pinch](https://github.com/prc5/react-zoom-pan-pinch)**
+  * プレビュー表示されたSVG領域において、マウスホイールでの拡大縮小（ズーム）、ドラッグスクロール（パン）、ダブルクリックでのリセットといったインタラクションを実現するReactコンポーネント。
+
