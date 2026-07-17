@@ -19,16 +19,6 @@ CLI ツール [pumlv](https://github.com/rin2yh/pumlv) を [Wails v2](https://wa
 
 ---
 
-## スクリーンショット
-
-_左列: ファイルツリー / 中央: SVG プレビュー / 右列: PlantUML ソース_
-
-![アプリ画面](Docs/screenshot.png)
-
-> スクリーンショットがない場合はビルド後に差し替えてください。
-
----
-
 ## セットアップ
 
 ### 前提条件
@@ -39,14 +29,6 @@ _左列: ファイルツリー / 中央: SVG プレビュー / 右列: PlantUML 
 | Node.js | 20 以上 | |
 | Wails CLI | v2.12 以上 | `go install github.com/wailsapp/wails/v2/cmd/wails@latest` |
 | npm | — | `wails.json` 内で `npm` を使用（pnpm も可）|
-
-### インストール
-
-```bash
-git clone https://github.com/<あなたのユーザー名>/pumlv-gui.git
-cd pumlv-gui
-go mod tidy
-```
 
 ---
 
