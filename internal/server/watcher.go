@@ -9,14 +9,15 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 const debounceInterval = 100 * time.Millisecond
 
-// Watcher は登録されたソースを監視し、Hub を通じてイベントを発行する
+// Watcher は登録されたソースを監視し、Wails Events でイベントを発行する
 type Watcher struct {
+	ctx      context.Context
 	registry *Registry
-	hub      *Hub
 	fsw      *fsnotify.Watcher
 
 	mu      sync.Mutex
@@ -24,14 +25,14 @@ type Watcher struct {
 }
 
 // NewWatcher は Watcher を生成し、すべてのソースルートを fsnotify ウォッチャーに登録する
-func NewWatcher(reg *Registry, hub *Hub) (*Watcher, error) {
+func NewWatcher(ctx context.Context, reg *Registry) (*Watcher, error) {
 	fsw, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, err
 	}
 	w := &Watcher{
+		ctx:      ctx,
 		registry: reg,
-		hub:      hub,
 		fsw:      fsw,
 		pending:  map[string]*time.Timer{},
 	}
@@ -59,7 +60,7 @@ func (w *Watcher) addSource(s sourceRoot) error {
 	return w.fsw.Add(filepath.Dir(s.path))
 }
 
-// Start はウォッチループを goroutine で起動する（donegroup なし）
+// Start はウォッチループを goroutine で起動する
 func (w *Watcher) Start(ctx context.Context) error {
 	go func() {
 		w.loop(ctx)
@@ -93,12 +94,15 @@ func (w *Watcher) handleEvent(event fsnotify.Event) {
 		}
 	}
 
+	// ファイルツリー変更（作成・削除・リネーム）
 	if event.Op&(fsnotify.Create|fsnotify.Remove|fsnotify.Rename) != 0 {
 		if err := w.registry.Refresh(); err == nil {
-			w.hub.Broadcast(Event{Name: "tree", Data: map[string]any{}})
+			// "tree:changed" イベントを Wails ランタイム経由でフロントエンドに送信
+			runtime.EventsEmit(w.ctx, "tree:changed")
 		}
 	}
 
+	// ファイル内容変更
 	if w.registry.matchExt(event.Name) && event.Op&(fsnotify.Write|fsnotify.Create|fsnotify.Rename) != 0 {
 		w.debounce(event.Name)
 	}
@@ -115,7 +119,8 @@ func (w *Watcher) debounce(path string) {
 		delete(w.pending, path)
 		w.mu.Unlock()
 		if w.registry.Allowed(path) {
-			w.hub.Broadcast(Event{Name: "changed", Data: map[string]string{"path": path}})
+			// "file:changed" イベントを Wails ランタイム経由でフロントエンドに送信
+			runtime.EventsEmit(w.ctx, "file:changed", path)
 		}
 	})
 }

@@ -1,25 +1,32 @@
-import { getApiBaseUrl } from "./base-url";
+/**
+ * Wails Events 経由でファイル変更通知を受け取る。
+ * Phase 2A: SSE（EventSource）から Wails EventsOn/EventsOff へ移行済み。
+ * Go 側の watcher.go が runtime.EventsEmit で "file:changed" / "tree:changed" を発行する。
+ */
+import { EventsOn } from "../../wailsjs/runtime/runtime";
 
-export type ServerEvent = { type: "changed"; path: string } | { type: "tree" } | { type: "hello" };
+export type ServerEvent = { type: "changed"; path: string } | { type: "tree" };
 
 export type EventHandler = (ev: ServerEvent) => void;
 
 /**
- * subscribe は SSE 接続を開き、イベントハンドラーを登録する。
- * API URL は initApiUrl()（base-url.ts）でキャッシュされた値を使用する。
- * クリーンアップ関数を返す。
+ * subscribe は Wails Events リスナーを登録し、クリーンアップ関数を返す。
+ * useServerEvents フックから useEffect 内で呼ばれる。
  */
 export function subscribe(onEvent: EventHandler): () => void {
-  const source = new EventSource(`${getApiBaseUrl()}/api/events`);
-  source.addEventListener("changed", (e) => {
-    const data = JSON.parse((e as MessageEvent).data) as { path: string };
-    onEvent({ type: "changed", path: data.path });
+  // "file:changed" イベント: Go 側から path が第一引数で渡される
+  const offChanged = EventsOn("file:changed", (path: string) => {
+    onEvent({ type: "changed", path });
   });
-  source.addEventListener("tree", () => {
+
+  // "tree:changed" イベント: ファイルツリー再取得が必要
+  const offTree = EventsOn("tree:changed", () => {
     onEvent({ type: "tree" });
   });
-  source.addEventListener("hello", () => {
-    onEvent({ type: "hello" });
-  });
-  return () => source.close();
+
+  // クリーンアップ: Wails EventsOn の戻り値は登録解除関数
+  return () => {
+    offChanged();
+    offTree();
+  };
 }

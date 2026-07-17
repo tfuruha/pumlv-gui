@@ -125,7 +125,11 @@ Wails の `window.go.main.App.GetAPIAddress` は `OnStartup` 完了後に呼べ�
 2. **ステップ 2-2**: `watcher.go` で `hub.Broadcast` → `runtime.EventsEmit` に変更
    - フロントエンドの `api/events.ts` を `EventsOn` に置き換え
    - `use-server-events.ts` を Wails Events 対応に書き換え
-3. **ステップ 2-3**: `handlers.go` と `hub.go` を削除、`server.go` を簡素化
+3. **ステップ 2-3**: ⚠️ **ステップ 2-2 完了・テスト（V10 合格）後に実施すること**
+   - `handlers.go` を削除（SSE ハンドラー不要）
+   - `hub.go` を削除（`watcher.go` の `hub.Broadcast` 呼び出しが消えた後）
+   - `server.go` を HTTP サーバーごと除去し、`Service` 構造体に全面置換（または完全削除）
+   - `net/http` への依存が完全に消えることを `go build ./...` で確認
 
 ### Phase 2B: GUI 機能拡張
 
@@ -136,8 +140,10 @@ Wails の `window.go.main.App.GetAPIAddress` は `OnStartup` 完了後に呼べ�
 
 ### Phase 2 着手前に確認すべきこと
 
-- `wailsjs/` ディレクトリが自動生成されている（`wails dev` 実行後に生成される）
+- **`wailsjs/` を最新状態に再生成してから着手する**
+  - `wails dev -appargs "D:/work/pumlv-gui/pumlv/examples"` を一度実行し、`frontend/wailsjs/` が最新の `app.go` バインディングと一致していることを確認する
   - `frontend/wailsjs/go/main/App.ts` に `GetAPIAddress` バインディングが含まれているはず
+  - バインディングが存在しない状態でフロントエンドのインポートを書き換えると TypeScript ビルドが即エラーになるため、**再生成を先に行うこと**
 - Phase 2A で HTTP サーバーを除去した後、`go.mod` の `net/http` 依存は自然に消える
   （ただし `fsnotify` は Watcher で引き続き使用）
 

@@ -59,7 +59,6 @@ describe("useServerEvents", () => {
       treeCalls: 0,
       changedArgs: ["/a.puml"],
     },
-    { name: "hello -> noop", event: { type: "hello" }, treeCalls: 0, changedArgs: [] },
   ])("routes $name", ({ event, treeCalls, changedArgs }) => {
     const onTree = vi.fn();
     const onChanged = vi.fn();

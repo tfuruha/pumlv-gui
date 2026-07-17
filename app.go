@@ -27,48 +27,55 @@ func (a *App) startup(ctx context.Context) {
 	// CLI 引数からパスを取得
 	paths := os.Args[1:]
 	if len(paths) == 0 {
-		// Phase 1 ではデフォルトで空のまま（ファイル一覧なし状態）
+		// Phase 2B で OS ダイアログに変更予定（現状は空のまま）
 		log.Println("起動引数なし: フォルダ未指定で起動します")
 		return
 	}
 
-	// 内部 HTTP サーバーを起動（API + SSE のみ、SPA 配信なし）
+	// Service を起動（ファイル監視 + Wails Events 通知）
 	opts := server.Options{
 		Paths: paths,
-		Host:  "127.0.0.1",
-		Port:  0, // 空きポートを自動選択
 		Exts:  []string{".puml", ".plantuml", ".iuml", ".wsd"},
 	}
 
 	srv, err := server.New(ctx, opts)
 	if err != nil {
-		log.Printf("サーバーの初期化に失敗しました: %v\n", err)
+		log.Printf("サービスの初期化に失敗しました: %v\n", err)
 		return
 	}
 
-	addr, err := srv.Start(ctx)
-	if err != nil {
-		log.Printf("サーバーの起動に失敗しました: %v\n", err)
+	if err := srv.Start(ctx); err != nil {
+		log.Printf("サービスの起動に失敗しました: %v\n", err)
 		return
 	}
 
 	a.srv = srv
-	log.Printf("内蔵 HTTP サーバーを起動しました: %s\n", addr)
+	log.Println("ファイル監視サービスを起動しました")
 }
 
 // shutdown は Wails フレームワークからシャットダウン時に呼ばれるコールバック
 func (a *App) shutdown(ctx context.Context) {
 	if a.srv != nil {
 		if err := a.srv.Shutdown(); err != nil {
-			log.Printf("サーバーのシャットダウンに失敗しました: %v\n", err)
+			log.Printf("サービスのシャットダウンに失敗しました: %v\n", err)
 		}
 	}
 }
 
-// GetAPIAddress はフロントエンドが API サーバーの URL を取得するために呼ぶ Wails バインディングメソッド
-func (a *App) GetAPIAddress() string {
+// GetFiles はフロントエンドに公開する Wails バインディング。
+// 監視中のファイルエントリ一覧を返す。
+func (a *App) GetFiles() []server.FileEntry {
 	if a.srv == nil {
-		return ""
+		return []server.FileEntry{}
 	}
-	return fmt.Sprintf("http://%s", a.srv.Addr())
+	return a.srv.GetFiles()
+}
+
+// GetFileSource はフロントエンドに公開する Wails バインディング。
+// 指定パスのファイル内容を文字列で返す。
+func (a *App) GetFileSource(path string) (string, error) {
+	if a.srv == nil {
+		return "", fmt.Errorf("サービスが起動していません")
+	}
+	return a.srv.GetFileSource(path)
 }
