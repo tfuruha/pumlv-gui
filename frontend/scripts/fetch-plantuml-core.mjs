@@ -1,14 +1,13 @@
-// Downloads the TeaVM-compiled PlantUML build (plantuml.js + viz-global.js)
-// from the upstream plantuml/plantuml release "snapshot" zip and places the
-// two required files into internal/frontend/public/plantuml/ so Vite copies
-// them into internal/static/dist/.
+// アップストリームの plantuml/plantuml リリース "v1.2026.6" ZIP から
+// TeaVM コンパイル済みの PlantUML ビルド (plantuml.js + viz-global.js) をダウンロードし、
+// Vite がコピーできるように frontend/public/plantuml/ に配置する。
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { unzipSync } from "fflate";
 
-const SNAPSHOT_ZIP =
-  "https://github.com/plantuml/plantuml/releases/download/snapshot/js-plantuml-SNAPSHOT.zip";
+const PLANTUML_RELEASE_ZIP =
+  "https://github.com/plantuml/plantuml/releases/download/v1.2026.6/js-plantuml-1.2026.6.zip";
 const REQUIRED_FILES = ["plantuml.js", "viz-global.js"];
 
 // The upstream TeaVM build rejects diagrams whose layout exceeds 4096px on
@@ -51,7 +50,7 @@ function patchPlantumlJs(filePath) {
       // Bail out so the broken state is visible rather than silent.
       console.error(
         `plantuml.js patch failed: expected "${from}" or "${to}" not found.\n` +
-          "The upstream TeaVM build may have changed. Update PLANTUML_PATCHES in fetch-plantuml-core.mjs.",
+        "The upstream TeaVM build may have changed. Update PLANTUML_PATCHES in fetch-plantuml-core.mjs.",
       );
       process.exit(1);
     }
@@ -74,8 +73,8 @@ const haveAll = REQUIRED_FILES.every((f) => {
 });
 
 if (!haveAll) {
-  console.log(`downloading ${SNAPSHOT_ZIP}`);
-  const res = await fetch(SNAPSHOT_ZIP, { redirect: "follow" });
+  console.log(`downloading ${PLANTUML_RELEASE_ZIP}`);
+  const res = await fetch(PLANTUML_RELEASE_ZIP, { redirect: "follow" });
   if (!res.ok) {
     console.error(`fetch failed: HTTP ${res.status} ${res.statusText}`);
     process.exit(1);

@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"pumlv-gui/internal/config"
 	"pumlv-gui/internal/server"
@@ -71,8 +72,9 @@ func (a *App) domReady(ctx context.Context) {
 	a.srvMu.Unlock()
 
 	if srv == nil {
-		// 少しディレイを入れるか、goroutineで非同期実行してUIブロックを回避
+		// WebViewとウィンドウの描画が落ち着くまで少しディレイを入れる
 		go func() {
+			time.Sleep(500 * time.Millisecond)
 			log.Println("フォルダ未指定のため、フォルダ選択ダイアログを表示します")
 			folder, err := a.SelectFolder()
 			if err == nil && folder != "" {
@@ -163,9 +165,17 @@ func (a *App) GetFileSource(path string) (string, error) {
 
 // SelectFolder は OS標準のフォルダ選択ダイアログを表示してパスを返す
 func (a *App) SelectFolder() (string, error) {
+	defaultDir := a.cfg.LastFolder
+	if defaultDir != "" {
+		// ディレクトリの実在チェックを行い、存在しない場合は空文字にしてOSのデフォルト位置にフォールバックさせる
+		if info, err := os.Stat(defaultDir); err != nil || !info.IsDir() {
+			defaultDir = ""
+		}
+	}
+
 	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
 		Title:            "フォルダを開く",
-		DefaultDirectory: a.cfg.LastFolder,
+		DefaultDirectory: defaultDir,
 	})
 }
 
