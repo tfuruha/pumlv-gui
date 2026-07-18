@@ -1,119 +1,70 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { subscribe, type ServerEvent } from "./events";
+import { EventsOn } from "../../wailsjs/runtime/runtime";
 
-type Listener = (event: MessageEvent) => void;
+// Wails runtime EventsOn のモック
+vi.mock("../../wailsjs/runtime/runtime", () => ({
+  EventsOn: vi.fn(),
+}));
 
-class MockEventSource {
-  static instances: MockEventSource[] = [];
-
-  readonly url: string;
-  readonly listeners = new Map<string, Set<Listener>>();
-  closed = false;
-
-  constructor(url: string) {
-    this.url = url;
-    MockEventSource.instances.push(this);
-  }
-
-  addEventListener(type: string, listener: Listener): void {
-    const set = this.listeners.get(type) ?? new Set<Listener>();
-    set.add(listener);
-    this.listeners.set(type, set);
-  }
-
-  close(): void {
-    this.closed = true;
-  }
-
-  emit(type: string, data?: unknown): void {
-    const set = this.listeners.get(type);
-    if (!set) return;
-    const payload = data === undefined ? "" : JSON.stringify(data);
-    const event = new MessageEvent(type, { data: payload });
-    for (const listener of set) {
-      listener(event);
-    }
-  }
-}
-
-const originalEventSource = globalThis.EventSource;
+const mockedEventsOn = vi.mocked(EventsOn);
 
 beforeEach(() => {
-  MockEventSource.instances = [];
-  (globalThis as unknown as { EventSource: typeof MockEventSource }).EventSource = MockEventSource;
-});
-
-afterEach(() => {
-  (globalThis as unknown as { EventSource: typeof EventSource }).EventSource = originalEventSource;
+  vi.clearAllMocks();
 });
 
 describe("subscribe", () => {
-  it("connects to /api/events", () => {
+  it("file:changed と tree:changed のイベントリスナーを登録すること", () => {
+    const offFileChanged = vi.fn();
+    const offTreeChanged = vi.fn();
+    mockedEventsOn.mockImplementation((event) => {
+      if (event === "file:changed") return offFileChanged;
+      if (event === "tree:changed") return offTreeChanged;
+      return vi.fn();
+    });
+
     const cleanup = subscribe(() => {});
-    expect(MockEventSource.instances).toHaveLength(1);
-    expect(MockEventSource.instances[0]!.url).toBe("/api/events");
+    expect(mockedEventsOn).toHaveBeenCalledWith("file:changed", expect.any(Function));
+    expect(mockedEventsOn).toHaveBeenCalledWith("tree:changed", expect.any(Function));
+
     cleanup();
+    expect(offFileChanged).toHaveBeenCalledTimes(1);
+    expect(offTreeChanged).toHaveBeenCalledTimes(1);
   });
 
-  it("dispatches 'changed' with the parsed path", () => {
-    const seen: ServerEvent[] = [];
-    const cleanup = subscribe((ev) => seen.push(ev));
+  it("file:changed が発火されたときに 'changed' イベントをディスパッチすること", () => {
+    let fileChangedCallback: ((path: string) => void) | null = null;
+    mockedEventsOn.mockImplementation((event, cb) => {
+      if (event === "file:changed") {
+        fileChangedCallback = cb as any;
+      }
+      return vi.fn();
+    });
 
-    MockEventSource.instances[0]!.emit("changed", { path: "/tmp/a.puml" });
+    const seen: ServerEvent[] = [];
+    subscribe((ev) => seen.push(ev));
+
+    expect(fileChangedCallback).not.toBeNull();
+    fileChangedCallback!("/tmp/a.puml");
 
     expect(seen).toEqual([{ type: "changed", path: "/tmp/a.puml" }]);
-    cleanup();
   });
 
-  it("dispatches 'tree' without payload", () => {
-    const seen: ServerEvent[] = [];
-    const cleanup = subscribe((ev) => seen.push(ev));
+  it("tree:changed が発火されたときに 'tree' イベントをディスパッチすること", () => {
+    let treeChangedCallback: (() => void) | null = null;
+    mockedEventsOn.mockImplementation((event, cb) => {
+      if (event === "tree:changed") {
+        treeChangedCallback = cb as any;
+      }
+      return vi.fn();
+    });
 
-    MockEventSource.instances[0]!.emit("tree");
+    const seen: ServerEvent[] = [];
+    subscribe((ev) => seen.push(ev));
+
+    expect(treeChangedCallback).not.toBeNull();
+    treeChangedCallback!();
 
     expect(seen).toEqual([{ type: "tree" }]);
-    cleanup();
-  });
-
-  it("dispatches 'hello' on connect", () => {
-    const seen: ServerEvent[] = [];
-    const cleanup = subscribe((ev) => seen.push(ev));
-
-    MockEventSource.instances[0]!.emit("hello");
-
-    expect(seen).toEqual([{ type: "hello" }]);
-    cleanup();
-  });
-
-  it("dispatches multiple events in arrival order", () => {
-    const seen: ServerEvent[] = [];
-    const cleanup = subscribe((ev) => seen.push(ev));
-
-    const src = MockEventSource.instances[0]!;
-    src.emit("hello");
-    src.emit("changed", { path: "/p/a.puml" });
-    src.emit("tree");
-
-    expect(seen).toEqual([
-      { type: "hello" },
-      { type: "changed", path: "/p/a.puml" },
-      { type: "tree" },
-    ]);
-    cleanup();
-  });
-
-  it("returns a cleanup that closes the EventSource", () => {
-    const cleanup = subscribe(() => {});
-    expect(MockEventSource.instances[0]!.closed).toBe(false);
-    cleanup();
-    expect(MockEventSource.instances[0]!.closed).toBe(true);
-  });
-
-  it("throws on malformed 'changed' payload", () => {
-    const cleanup = subscribe(() => {});
-    const src = MockEventSource.instances[0]!;
-    const listener = [...src.listeners.get("changed")!][0]!;
-    expect(() => listener(new MessageEvent("changed", { data: "not json" }))).toThrow();
-    cleanup();
   });
 });

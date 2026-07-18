@@ -21,6 +21,12 @@ vi.mock("./plantuml/renderer", () => ({
   renderPlantUML: vi.fn(),
 }));
 
+vi.mock("../wailsjs/go/main/App", () => ({
+  GetLastFolder: vi.fn().mockResolvedValue("/mock/folder"),
+  SelectFolder: vi.fn().mockResolvedValue("/mock/folder"),
+  OpenFolder: vi.fn().mockResolvedValue(undefined),
+}));
+
 const mockedFetchFiles = vi.mocked(fetchFiles);
 const mockedFetchFileSource = vi.mocked(fetchFileSource);
 const mockedRenderPlantUML = vi.mocked(renderPlantUML);
@@ -43,6 +49,7 @@ const RENDERED: Record<string, string> = {
 let capturedEventHandler: EventHandler | null = null;
 
 beforeEach(() => {
+  localStorage.clear();
   capturedEventHandler = null;
   mockedFetchFiles.mockResolvedValue(FILES);
   mockedFetchFileSource.mockImplementation(async (path) => SOURCES[path] ?? "");
@@ -97,11 +104,11 @@ describe("App", () => {
       render(<App />);
       await flush(5);
 
-      expect(toggleButton().textContent).toBe(SOURCE_TOGGLE_LABEL.open);
+      expect(toggleButton().title).toBe(SOURCE_TOGGLE_LABEL.open);
       expect(sourcePanel().hasAttribute("hidden")).toBe(false);
 
       act(() => toggleButton().click());
-      expect(toggleButton().textContent).toBe(SOURCE_TOGGLE_LABEL.closed);
+      expect(toggleButton().title).toBe(SOURCE_TOGGLE_LABEL.closed);
       expect(toggleButton().getAttribute("aria-expanded")).toBe("false");
       expect(sourcePanel().hasAttribute("hidden")).toBe(true);
     });
@@ -113,8 +120,43 @@ describe("App", () => {
       act(() => toggleButton().click());
       act(() => toggleButton().click());
 
-      expect(toggleButton().textContent).toBe(SOURCE_TOGGLE_LABEL.open);
+      expect(toggleButton().title).toBe(SOURCE_TOGGLE_LABEL.open);
       expect(sourcePanel().hasAttribute("hidden")).toBe(false);
+    });
+  });
+
+  describe("sidebar toggle", () => {
+    const sidebarToggleButton = (): HTMLButtonElement => {
+      const buttons = document.querySelectorAll<HTMLButtonElement>("header button");
+      for (const b of buttons) {
+        if (b.title === "サイドバーを閉じる" || b.title === "サイドバーを開く") return b;
+      }
+      throw new Error("sidebar toggle button not found");
+    };
+
+    const sidebar = (): HTMLElement | null => document.querySelector("aside");
+
+    it("ボタンクリックでサイドバーが非表示になること", async () => {
+      render(<App />);
+      await flush(5);
+
+      expect(sidebar()).not.toBeNull();
+      expect(sidebarToggleButton().title).toBe("サイドバーを閉じる");
+
+      act(() => sidebarToggleButton().click());
+      expect(sidebar()).toBeNull();
+      expect(sidebarToggleButton().title).toBe("サイドバーを開く");
+    });
+
+    it("非表示状態からもう一度クリックするとサイドバーが再表示されること", async () => {
+      render(<App />);
+      await flush(5);
+
+      act(() => sidebarToggleButton().click());
+      act(() => sidebarToggleButton().click());
+
+      expect(sidebar()).not.toBeNull();
+      expect(sidebarToggleButton().title).toBe("サイドバーを閉じる");
     });
   });
 

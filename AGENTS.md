@@ -42,19 +42,16 @@ pumlv-gui/
 ├── .gitignore
 │
 ├── internal/
-│   └── server/                # 内蔵 HTTP サーバー（pumlv から移植）
+│   └── server/                # 監視サービス
 │       ├── server.go          # Server 構造体（donegroup 除去済み）
-│       ├── handlers.go        # API ハンドラー（/api/files, /api/file, /api/events）
 │       ├── files.go           # Registry — ファイル管理
-│       ├── hub.go             # Hub — SSE ブロードキャスト
 │       └── watcher.go         # Watcher — fsnotify ファイル監視
 │
 ├── frontend/                  # React + Vite + TypeScript SPA
 │   ├── src/
 │   │   ├── api/
-│   │   │   ├── base-url.ts    # API URL キャッシュ（Wails バインディング経由）
-│   │   │   ├── files.ts       # /api/files, /api/file クライアント
-│   │   │   └── events.ts      # SSE クライアント
+│   │   │   ├── files.ts       # GetFiles / GetFileSource バインディングクライアント
+│   │   │   └── events.ts      # Wails EventsOn クライアント
 │   │   ├── hooks/
 │   │   │   ├── use-file-list.ts
 │   │   │   ├── use-active-render.ts
@@ -81,8 +78,8 @@ pumlv-gui/
 | 層 | pumlv オリジナル | pumlv-gui |
 |---|---|---|
 | エントリポイント | Cobra CLI | `os.Args` + `wails.Run()` |
-| バックエンド通信 | `net/http` REST + SSE | 内蔵 HTTP + Wails バインディング |
-| フロントエンド API | `fetch()` + `EventSource`（相対パス） | `fetch()` + `EventSource`（`initApiUrl()` で動的 URL 取得） |
+| バックエンド通信 | `net/http` REST + SSE | Wails バインディング + Events (内蔵 HTTP なし) |
+| フロントエンド API | `fetch()` + `EventSource`（相対パス） | Wails バインディング + `EventsOn` |
 | ファイル監視 | `fsnotify` + `donegroup` | `fsnotify` + 標準 `goroutine/context` |
 | SPA 配信 | `go:embed` + `handleStatic()` | Wails AssetServer |
 | plantuml.js ロード | `import()` 直接 | `fetch()` + Blob URL（Vite 8 対応） |
@@ -92,7 +89,7 @@ pumlv-gui/
 ## フェーズ構成
 
 - **Phase 1 (完了)**: pumlv の内部 HTTP サーバーをそのまま内蔵し、Wails WebView からアクセス
-- **Phase 2 (予定)**: HTTP サーバーを Wails バインディング + Events に置き換え、GUI 機能（DnD、メニュー、設定記憶）を実装
+- **Phase 2 (完了/進行中)**: HTTP サーバーを Wails バインディング + Events に置き換え、GUI 機能（DnD、メニュー、設定記憶、ドラッグによるファイルペイン幅調整・トグル）を実装
 
 詳細は [PlansWalks/implementation_plan_260715.md](PlansWalks/implementation_plan_260715.md) を参照。
 
@@ -109,7 +106,7 @@ pumlv-gui/
 
 ### TypeScript / React
 
-- API URL は `frontend/src/api/base-url.ts` の `initApiUrl()` で一元管理
+- 設定やUI状態の永続化には LocalStorage を使用する（ペイン幅 `sidebarWidth`、表示状態 `sidebarOpen` / `sourceOpen` など）
 - `/public` ディレクトリのファイルは `import()` ではなく `fetch()` + Blob URL で読み込む（Vite 8 制約）
 - テストは Vitest（ユニット）+ Playwright（E2E）
 - スタイルは Tailwind CSS v4
@@ -119,8 +116,7 @@ pumlv-gui/
 ## 既知の制約・注意事項
 
 1. **`wails dev -appargs` のパス**: バックスラッシュがエスケープされるため、フォワードスラッシュ（`/`）または絶対パスを使用すること
-2. **Phase 1 の HTTP サーバー**: CORS ヘッダー (`Access-Control-Allow-Origin: *`) を付与しているが、`127.0.0.1` のみにバインドしているので安全
-3. **plantuml.js の容量**: 約 4MB。ビルド時に `fetch-plantuml-core.mjs` で自動ダウンロードされる
+2. **plantuml.js の容量**: 約 4MB。ビルド時に `fetch-plantuml-core.mjs` で自動ダウンロードされる
 
 ---
 
