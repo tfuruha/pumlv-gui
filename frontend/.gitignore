@@ -148,3 +148,6 @@ public/plantuml/
 # Storybook
 storybook-static/
 
+# Test results
+test-results/
+
