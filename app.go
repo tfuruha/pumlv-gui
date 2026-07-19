@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"os"
@@ -189,3 +190,38 @@ func (a *App) OpenFolder(path string) error {
 func (a *App) GetLastFolder() string {
 	return a.cfg.LastFolder
 }
+
+// SaveAsPNG は Base64 エンコードされた PNG データをファイルとして保存する
+func (a *App) SaveAsPNG(base64Data string, defaultName string) error {
+	// 1. 保存先パスをダイアログで取得
+	savePath, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           "PNG として保存",
+		DefaultFilename: defaultName + ".png",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "PNG 画像 (*.png)", Pattern: "*.png"},
+		},
+	})
+	if err != nil {
+		log.Printf("保存ダイアログの表示に失敗しました: %v\n", err)
+		return err
+	}
+	if savePath == "" {
+		return nil // ユーザーがキャンセルした場合は正常終了
+	}
+
+	// 2. Base64 デコード
+	data, err := base64.StdEncoding.DecodeString(base64Data)
+	if err != nil {
+		log.Printf("Base64のデコードに失敗しました: %v\n", err)
+		return fmt.Errorf("Base64 デコードに失敗しました: %w", err)
+	}
+
+	// 3. ファイル書き込み
+	if err := os.WriteFile(savePath, data, 0644); err != nil {
+		log.Printf("ファイルの書き込みに失敗しました: %v\n", err)
+		return err
+	}
+
+	return nil
+}
+

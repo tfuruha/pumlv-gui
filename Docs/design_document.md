@@ -59,7 +59,10 @@ graph TD
 - **`App` 構造体 (`app.go`)**
   - Wails ライフサイクル（`startup`, `domReady`, `shutdown`）を管理します。
   - `os.Args` による起動引数の解析や、`domReady` 時の自動ダイアログオープン制御を行います。
-  - フロントエンドに公開されるすべての Go メソッド（Wails バインディング）を実装します。
+  - フロントエンドに公開される Go メソッド（Wails バインディング）を実装します。
+    - `GetFiles()`: 監視中のファイル一覧を取得。
+    - `GetFileSource()`: 指定されたファイルのソースコードを取得。
+    - `SaveAsPNG(base64Data, defaultName)`: フロントエンドから送信されたBase64エンコード済みのPNGデータをデコードし、OS標準のファイル保存ダイアログ（`runtime.SaveFileDialog`）を開いてローカルファイルに書き出します。
 
 ### 3.2 フォルダ監視・ファイルシステム管理 (`internal/server/`)
 - **`Server` (`server.go`)**
@@ -100,7 +103,8 @@ graph TD
       - ペインの幅および開閉状態は `localStorage` に保存され、起動時に復元されます。
 - **`components/`**
   - `FileTree`: 監視フォルダ内の相対パス構造に基づき、ツリーUIを描画します。
-  - `Preview`: PlantUML が生成した SVG テキストを DOM に注入し、拡大・縮小・リセットボタン等のインタラクションを提供します。
+  - `Preview`: PlantUML が生成した SVG テキストを DOM に注入し、拡大・縮小・リセットボタン等のインタラクションを提供します。また右上に `ExportControls` を配置します。
+  - `ExportControls`: レンダリングされた図を PNG 画像として「クリップボードにコピー」および「ファイル保存」するためのフローティングアクションボタン UI です。
   - `SourceView`: 選択中ファイルのコードをシンタックスハイライト付きで表示します。
 
 ### 4.2 Wails 連携 API 層 (`frontend/src/api/` & `hooks/`)
@@ -114,6 +118,17 @@ graph TD
 ### 4.3 PlantUML レンダリング機構 (`frontend/src/plantuml/`)
 - Vite 8 の `/public` ディレクトリ制約に対応するため、静的な `import()` ではなく、`fetch()` を使用して `/plantuml/plantuml.js` のテキストデータを取得し、Blob URL を生成して動的にインポートします。
 - レンダリング自体はブラウザ（WebView）内の WebAssembly/TeaVM (viz-global.js) で高速に実行されます。
+
+### 4.4 外部連携（PNGエクスポート）設計 (`frontend/src/lib/svg-to-png.ts`)
+- **SVG から PNG への変換**:
+  - `DOMParser` で SVG の `viewBox` または幅・高さ属性を取得して元サイズを算出し、`Canvas API` を用いてラスタライズを実行します。
+  - Word などのドキュメント貼り付け品質（印刷耐性）を考慮し、デフォルトの解像度倍率を `3`（3倍、実質約250〜300dpi相当）に設定しています。
+  - 図の見切れ防止および暗い背景の仕様書への対応として、`12px` の白い余白（Padding）を追加し、背景を白色 (`#ffffff`) で塗りつぶして出力します。
+  - これらの設定は `svg-to-png.ts` 内の定数（`DEFAULT_SCALE`、`DEFAULT_PADDING`）として定義されており、容易に編集が可能です。
+- **クリップボード連携**:
+  - `Canvas.toBlob()` を経由して取得した PNG Blob を `ClipboardItem` API に渡し、ブラウザ標準の `navigator.clipboard.write()` 経由でクリップボードにコピーします。これにより、そのまま外部ドキュメント等へ Ctrl+V で貼り付けが可能です。
+- **ファイル保存**:
+  - 生成した PNG Blob を Base64 文字列に変換し、Wails バインディング `SaveAsPNG` を呼び出します。バックエンド側で OS 標準のファイルダイアログを表示して任意の場所へ書き出します。
 
 ---
 

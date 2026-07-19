@@ -56,10 +56,17 @@ pumlv-gui/
 │   │   │   ├── use-file-list.ts
 │   │   │   ├── use-active-render.ts
 │   │   │   └── use-server-events.ts
+│   │   ├── lib/
+│   │   │   ├── lines.ts
+│   │   │   └── svg-to-png.ts  # SVG Data URL -> PNG Blob 変換（余白/解像度調整）
 │   │   ├── plantuml/
 │   │   │   ├── bootstrap.ts   # plantuml.js ローダー（Vite 8 対応）
 │   │   │   └── renderer.ts
 │   │   └── components/
+│   │       └── preview/
+│   │           ├── index.tsx  # プレビューコンポーネント（ExportControls 組み込み）
+│   │           └── export-controls.tsx # コピー＆保存アクションボタン UI
+
 │   └── public/
 │       └── plantuml/          # ビルド時にダウンロード（.gitignore 対象）
 │           ├── plantuml.js
@@ -89,9 +96,11 @@ pumlv-gui/
 ## フェーズ構成
 
 - **Phase 1 (完了)**: pumlv の内部 HTTP サーバーをそのまま内蔵し、Wails WebView からアクセス
-- **Phase 2 (完了/進行中)**: HTTP サーバーを Wails バインディング + Events に置き換え、GUI 機能（DnD、メニュー、設定記憶、ドラッグによるファイルペイン幅調整・トグル）を実装
+- **Phase 2 (完了)**: HTTP サーバーを Wails バインディング + Events に置き換え、GUI 機能（DnD、メニュー、設定記憶、ドラッグによるファイルペイン幅調整・トグル）を実装
+- **外部連携機能追加 (完了)**: レンダリングされた図のクリップボードへのPNGコピー機能、およびネイティブダイアログ経由でのPNG保存機能を実装。Wordなどの外部ドキュメントへの貼り付け品質を考慮した高解像度（3xスケール）および見切れ防止白余白（12px）を導入。
 
-詳細は [PlansWalks/implementation_plan_260715.md](PlansWalks/implementation_plan_260715.md) を参照。
+詳細は [PlansWalks/implementation_plan_260715.md](PlansWalks/implementation_plan_260715.md) および [PlansWalks/implementation_plan_export.md](PlansWalks/implementation_plan_export.md) を参照。
+
 
 ---
 

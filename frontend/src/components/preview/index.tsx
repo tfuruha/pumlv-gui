@@ -3,11 +3,13 @@ import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Minimap } from "./minimap";
 import { MAX_SCALE, MIN_SCALE } from "./zoom";
 import { ZoomControls } from "./zoom-controls";
+import { ExportControls } from "./export-controls";
 
-export function Preview({ svg }: { svg: string }): JSX.Element {
+export function Preview({ svg, fileName }: { svg: string; fileName?: string }): JSX.Element {
   const [isPanning, setIsPanning] = useState(false);
   return (
     <div className="relative h-full overflow-hidden">
+      <ExportControls svg={svg} fileName={fileName} />
       {/* key remounts the wrapper on file change, resetting zoom/pan state */}
       <TransformWrapper
         key={svg}
@@ -29,3 +31,4 @@ export function Preview({ svg }: { svg: string }): JSX.Element {
     </div>
   );
 }
+

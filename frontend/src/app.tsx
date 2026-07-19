@@ -224,7 +224,12 @@ export default function App(): JSX.Element {
               </pre>
             )}
 
-            {render.kind === "ok" && <Preview svg={render.svg} />}
+            {render.kind === "ok" && (
+              <Preview
+                svg={render.svg}
+                fileName={activeName.split("/").pop()?.replace(/\.[^.]+$/, "") || "diagram"}
+              />
+            )}
 
             {render.kind === "idle" && (
               <div className="absolute inset-0 grid place-items-center text-slate-400">
