@@ -9,6 +9,8 @@
 
 # Wails ビルド成果物
 build/bin/
+/dist/
+
 
 # フロントエンド
 frontend/node_modules/
