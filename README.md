@@ -1,7 +1,7 @@
 # pumlv-gui
 
-PlantUML ファイルをリアルタイムプレビューするデスクトップアプリ。  
-CLI ツール [pumlv](https://github.com/rin2yh/pumlv) を [Wails v2](https://wails.io/) によりデスクトップ GUI アプリとして再構築したものです。
+[PlantUML](https://plantuml.com/ja/) ファイルをリアルタイムプレビューするデスクトップアプリ。  
+CLI ツール [rin2yh/pumlv](https://github.com/rin2yh/pumlv) を [Wails v2](https://wails.io/) によりデスクトップ GUI アプリとして再構築したものです。
 
 ---
 

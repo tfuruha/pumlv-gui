@@ -66,7 +66,7 @@ pumlv-gui/
 │   │       └── preview/
 │   │           ├── index.tsx  # プレビューコンポーネント（ExportControls 組み込み）
 │   │           └── export-controls.tsx # コピー＆保存アクションボタン UI
-
+│   │
 │   └── public/
 │       └── plantuml/          # ビルド時にダウンロード（.gitignore 対象）
 │           ├── plantuml.js
