@@ -76,6 +76,9 @@ wails dev
 # 本番バイナリをビルド（build/bin/ に出力）
 wails build
 
+# リリース用パッケージ (ZIP) の作成（ビルドから dist/ への ZIP 打刻を一括実行）
+.\build-release.ps1
+
 # フロントエンドのみビルド
 cd frontend && npm run build
 
@@ -86,6 +89,10 @@ go build ./...
 ---
 
 ## 使い方
+
+### リリースパッケージ (ZIP) のダウンロード
+
+[最新リリース](https://github.com/tfuruha/pumlv-gui/releases) から `pumlv-gui-{platform}.zip` をダウンロードし、任意のフォルダに展開してください。
 
 ### フォルダ指定
 
@@ -114,6 +121,8 @@ pumlv-gui/
 ├── app.go                   # App 構造体（起動・終了・バインディング定義）
 ├── go.mod / go.sum
 ├── wails.json               # Wails プロジェクト設定
+├── build-release.ps1        # リリースパッケージ (ZIP) 作成スクリプト
+├── MANUAL.md                # ユーザーマニュアル
 │
 ├── internal/
 │   ├── server/              # ファイル監視サービス
