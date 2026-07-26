@@ -211,7 +211,7 @@ sequenceDiagram
 * **[PlantUML](https://plantuml.com/ja/)**
   * UMLや各種図をプレーンテキストで記述・生成するためのオープンソースプロジェクト。
 * **[plantuml.js](https://github.com/plantuml/plantuml.js)** / **[viz.js (mdaines/viz.js)](https://github.com/mdaines/viz.js)**
-  * WebView（ブラウザ）上で、JavaやGraphvizのローカル環境なしに単体でPlantUMLのSVGレンダリングを実行するライブラリ。ビルド時に `scripts/fetch-plantuml-core.mjs` を経由して自動的にダウンロードされ、`/public/plantuml/` 配下に配置されます。
+  * WebView（ブラウザ）上で、JavaやGraphvizのローカル環境なしに単体でPlantUMLのSVGレンダリングを実行するライブラリ。公式 npm パッケージ `@plantuml/core` (MIT ライセンス) より、ビルド時に `scripts/vendor-plantuml-core.mjs` を経由して自動的にコピー＆パッチ（サイズ制限引き上げ）され、`/public/plantuml/` 配下に配置されます。
 * **[Wails v2 (wailsapp/wails)](https://wails.io/)**
   * Goで書かれたバックエンドとWebフロントエンドを結合し、単一バイナリのデスクトップGUIアプリケーションとしてパッケージングするフレームワーク。
 * **[fsnotify (fsnotify/fsnotify)](https://github.com/fsnotify/fsnotify)**

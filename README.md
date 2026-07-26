@@ -36,8 +36,7 @@ CLI ツール [rin2yh/pumlv](https://github.com/rin2yh/pumlv) を [Wails v2](htt
   * **[Shiki](https://shiki.style/)** — 高性能なソースコードのシンタックスハイライト。
   * **[react-zoom-pan-pinch](https://github.com/prc5/react-zoom-pan-pinch)** — プレビューの直感的なズーム・スクロール操作サポート。
 * **レンダリングコア**
-  * **[PlantUML](https://plantuml.com/ja/)** — テキスト記述から UML ダイアグラムを生成するオープンソースツール。
-  * **[plantuml.js](https://github.com/plantuml/plantuml.js)** / **[viz.js](https://github.com/mdaines/viz.js)** — WebView上において、Java や Graphviz をローカルインストールすることなくブラウザのみで SVG レンダリングを行うための JavaScript 実装。
+  * **[@plantuml/core](https://www.npmjs.com/package/@plantuml/core)** / **[plantuml.js](https://github.com/plantuml/plantuml.js)** / **[viz.js](https://github.com/mdaines/viz.js)** — WebView上において、Java や Graphviz をローカルインストールすることなくブラウザのみで SVG レンダリングを行うための JavaScript 実装（MIT ライセンス）。ビルド時に `@plantuml/core` npm パッケージよりコピーおよびパッチ適用。
 
 ---
 

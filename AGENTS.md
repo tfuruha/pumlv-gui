@@ -68,7 +68,7 @@ pumlv-gui/
 │   │           └── export-controls.tsx # コピー＆保存アクションボタン UI
 │   │
 │   └── public/
-│       └── plantuml/          # ビルド時にダウンロード（.gitignore 対象）
+│       └── plantuml/          # ビルド時に @plantuml/core からコピー＆パッチ（.gitignore 対象）
 │           ├── plantuml.js
 │           └── viz-global.js
 │
@@ -98,8 +98,9 @@ pumlv-gui/
 - **Phase 1 (完了)**: pumlv の内部 HTTP サーバーをそのまま内蔵し、Wails WebView からアクセス
 - **Phase 2 (完了)**: HTTP サーバーを Wails バインディング + Events に置き換え、GUI 機能（DnD、メニュー、設定記憶、ドラッグによるファイルペイン幅調整・トグル）を実装
 - **外部連携機能追加 (完了)**: レンダリングされた図のクリップボードへのPNGコピー機能、およびネイティブダイアログ経由でのPNG保存機能を実装。Wordなどの外部ドキュメントへの貼り付け品質を考慮した高解像度（3xスケール）および見切れ防止白余白（12px）を導入。
+- **MIT Flavor 移行 (完了)**: `plantuml.js` の取得元を GPL 版 ZIP アーカイブから公式 npm パッケージ `@plantuml/core@1.2026.6` (MIT ライセンス) へ変更し、`scripts/vendor-plantuml-core.mjs` によるコピー＆パッチ（ダイアグラム制限を 65536px に引き上げ）へ切り替え。
 
-詳細は [PlansWalks/implementation_plan_260715.md](PlansWalks/implementation_plan_260715.md) および [PlansWalks/implementation_plan_export.md](PlansWalks/implementation_plan_export.md) を参照。
+詳細は [PlansWalks/implementation_plan_260715.md](PlansWalks/implementation_plan_260715.md)、[PlansWalks/implementation_plan_export.md](PlansWalks/implementation_plan_export.md) および [PlansWalks/implementation_plan_mit_flavor.md](PlansWalks/implementation_plan_mit_flavor.md) を参照。
 
 
 ---
@@ -125,7 +126,7 @@ pumlv-gui/
 ## 既知の制約・注意事項
 
 1. **`wails dev -appargs` のパス**: バックスラッシュがエスケープされるため、フォワードスラッシュ（`/`）または絶対パスを使用すること
-2. **plantuml.js の容量**: 約 4MB。ビルド時に `fetch-plantuml-core.mjs` で自動ダウンロードされる
+2. **plantuml.js の容量**: 約 4MB。ビルド時に `vendor-plantuml-core.mjs` により `@plantuml/core` (MIT) からコピーされ、ダイアグラムサイズ制限（65536px）がパッチされる
 
 ---
 
@@ -142,5 +143,5 @@ pumlv-gui/
   * **[fsnotify/fsnotify](https://github.com/fsnotify/fsnotify)** — ファイルシステム監視 (Go)
   * **[shikijs/shiki](https://shiki.style/)** — コードシンタックスハイライト (JS/TS)
   * **[react-zoom-pan-pinch](https://github.com/prc5/react-zoom-pan-pinch)** — プレビュー操作 (React)
-  * **[plantuml.js](https://github.com/plantuml/plantuml.js)** / **[viz.js](https://github.com/mdaines/viz.js)** — クライアントサイド PlantUML レンダラー
+  * **[@plantuml/core](https://www.npmjs.com/package/@plantuml/core)** / **[plantuml.js](https://github.com/plantuml/plantuml.js)** / **[viz.js](https://github.com/mdaines/viz.js)** — クライアントサイド PlantUML レンダラー（MIT ライセンス）
 
