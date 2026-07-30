@@ -1,7 +1,7 @@
 ---
 name: dep-version-management
 description: |
-  フロントエンド (npm/pnpm) および Go モジュールの依存バージョン管理方針を提供するスキル。
+  フロントエンド (Bun) および Go モジュールの依存バージョン管理方針を提供するスキル。
   ロックファイルの扱い、バージョン表記の使い分け、定期更新フロー、不要ファイルの検出を支援する。
 ---
 
@@ -13,8 +13,7 @@ description: |
 
 | ファイル | パッケージマネージャ | Git 管理 |
 |---|---|---|
-| `frontend/pnpm-lock.yaml` | pnpm | **必須** (コミット対象) |
-| `frontend/package-lock.json` | npm | **必須** (コミット対象) |
+| `frontend/bun.lock` | Bun | **必須** (コミット対象) |
 | `go.sum` | Go modules | **必須** (コミット対象) |
 
 - ロックファイルが存在すれば `^` 表記でも自動的にバージョンが上がることはない
@@ -57,37 +56,28 @@ SemVer が守られており、定期更新フローで安全にアップデー�
 
 ## 3. 定期更新フロー
 
-### 前提：pnpm のセットアップ
+### 前提：Bun の確認
 
-`pnpm` が未インストールの場合、以下の手順でインストールする。
+`bun` が未インストールの場合、[bun.sh](https://bun.sh) に従ってインストールする。
 
 ```powershell
-# npm 経由でグローバルインストール（管理者権限不要）
-npm install -g pnpm@11.0.8
+# Windows (PowerShell) でのインストール例
+powershell -c "irm bun.sh/install.ps1 | iex"
 
 # バージョン確認
-pnpm --version
+bun --version
 ```
-
-> [!NOTE]
-> `corepack enable pnpm` でも可能だが、`C:\Program Files\nodejs\` への書き込み権限が必要なため
-> 管理者権限がない環境では `npm install -g` が確実。
-> `package.json` の `"packageManager"` に指定されたバージョンと多少異なる 11.x 系でも動作する。
 
 ---
 
-### フロントエンド (pnpm)
+### フロントエンド (Bun)
 
 ```bash
-# 非インタラクティブで一括更新（推奨・ロックファイルも更新される）
-pnpm update
-
-# インタラクティブに選択しながら更新（対話 UI が必要な場合）
-# ※ --interactive --latest の組み合わせは環境によって対話 UI が起動しないことがある
-pnpm update --interactive --latest
+# パッケージの更新（ロックファイルも更新される）
+bun update
 
 # 更新後は必ずビルドとテストを実行
-cd frontend && pnpm run build && pnpm test
+cd frontend && bun run build && bun test
 ```
 
 ### Go モジュール
@@ -115,8 +105,8 @@ go build ./...
 
 ## 4. 不要なロックファイル検出
 
-Go プロジェクトのルートに誤って `package-lock.json` や `pnpm-lock.yaml` が生成されることがある。
-これはルートで `npm install` / `pnpm install` を誤実行した場合に発生する。
+Go プロジェクトのルートに誤って `package-lock.json` や `pnpm-lock.yaml`, `bun.lock` が生成されることがある。
+これはルートで `bun install` / `npm install` を誤実行した場合に発生する。
 
 ### 検出コマンド
 
@@ -127,18 +117,18 @@ Get-ChildItem -Path . -Depth 0 -Filter "*lock*" | Select-Object Name, Length
 
 ### 判断基準
 
-- `frontend/pnpm-lock.yaml` → 正常（Git 管理対象）
-- ルート直下の `package-lock.json` / `pnpm-lock.yaml` → **削除対象**
-  - `"packages": {}` のような空の内容であれば確実に不要
+- `frontend/bun.lock` → 正常（Git 管理対象）
+- ルート直下の `package-lock.json` / `pnpm-lock.yaml` / `bun.lock` → **削除対象**
+  - ルート直下のものは不要
 
 ### 削除手順
 
 ```powershell
 # 内容確認後に削除
-Remove-Item .\package-lock.json
-# または
-Remove-Item .\pnpm-lock.yaml
-```
+Remove-Item .\package-lock.json -ErrorAction SilentlyContinue
+Remove-Item .\pnpm-lock.yaml -ErrorAction SilentlyContinue
+Remove-Item .\bun.lock -ErrorAction SilentlyContinue
+``````
 
 ---
 

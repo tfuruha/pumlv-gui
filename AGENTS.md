@@ -20,7 +20,7 @@ wails dev -appargs "<フォルダパス>"
 wails build
 
 # フロントエンドのみビルド
-cd frontend && npm run build
+cd frontend && bun run build
 
 # Go コードのビルド確認
 go build ./...
