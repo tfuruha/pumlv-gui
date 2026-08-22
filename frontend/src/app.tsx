@@ -46,7 +46,6 @@ export default function App(): JSX.Element {
     document.addEventListener("mouseup", handleMouseUp);
   };
 
-
   // 起動時およびツリー変更時に開いているフォルダパスを取得
   const updateLastFolder = async () => {
     try {
@@ -145,15 +144,13 @@ export default function App(): JSX.Element {
             {files.length === 0 ? (
               <div className="px-4 py-8 text-center text-sm text-slate-400">
                 サポートされているファイルが見つかりません。
-                <div className="text-xs text-slate-500 mt-1">
-                  (.puml, .plantuml, .iuml, .wsd)
-                </div>
+                <div className="text-xs text-slate-500 mt-1">(.puml, .plantuml, .iuml, .wsd)</div>
               </div>
             ) : (
               <FileTree files={files} active={active} onSelect={select} />
             )}
           </div>
-          
+
           <div className="border-t border-slate-200 p-3 bg-slate-50">
             <p className="text-[10px] text-slate-400 truncate" title={lastFolder}>
               監視中: {lastFolder}
@@ -190,7 +187,9 @@ export default function App(): JSX.Element {
                 <line x1="9" y1="3" x2="9" y2="21" strokeWidth={2} />
               </svg>
             </button>
-            <span className="min-w-0 truncate font-medium">{activeName || "ファイルを選択してください"}</span>
+            <span className="min-w-0 truncate font-medium">
+              {activeName || "ファイルを選択してください"}
+            </span>
           </div>
 
           {active && (
@@ -227,13 +226,20 @@ export default function App(): JSX.Element {
             {render.kind === "ok" && (
               <Preview
                 svg={render.svg}
-                fileName={activeName.split("/").pop()?.replace(/\.[^.]+$/, "") || "diagram"}
+                fileName={
+                  activeName
+                    .split("/")
+                    .pop()
+                    ?.replace(/\.[^.]+$/, "") || "diagram"
+                }
               />
             )}
 
             {render.kind === "idle" && (
               <div className="absolute inset-0 grid place-items-center text-slate-400">
-                {files.length > 0 ? "ファイルツリーからプレビューするファイルを選択してください" : "監視フォルダに有効なファイルがありません"}
+                {files.length > 0
+                  ? "ファイルツリーからプレビューするファイルを選択してください"
+                  : "監視フォルダに有効なファイルがありません"}
               </div>
             )}
           </section>

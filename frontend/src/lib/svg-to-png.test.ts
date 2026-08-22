@@ -9,11 +9,11 @@ describe("svgDataUrlToPngBlob", () => {
       class {
         _src = "";
         onload: () => void = () => {};
-        
+
         get src() {
           return this._src;
         }
-        
+
         set src(val: string) {
           this._src = val;
           // 代入後、非同期で onload を呼び出してロード完了をシミュレート
@@ -21,13 +21,11 @@ describe("svgDataUrlToPngBlob", () => {
             if (this.onload) this.onload();
           }, 0);
         }
-      }
+      },
     );
 
     // HTMLCanvasElement.prototype.getContext のモックを注入
-    HTMLCanvasElement.prototype.getContext = function (
-      contextId: string
-    ): any {
+    HTMLCanvasElement.prototype.getContext = function (contextId: string): any {
       if (contextId === "2d") {
         return {
           scale: () => {},
@@ -43,7 +41,7 @@ describe("svgDataUrlToPngBlob", () => {
     HTMLCanvasElement.prototype.toBlob = function (
       callback: (blob: Blob | null) => void,
       _type?: string,
-      _quality?: unknown
+      _quality?: unknown,
     ) {
       callback(new Blob(["mocked-png-data"], { type: "image/png" }));
     };
@@ -57,7 +55,7 @@ describe("svgDataUrlToPngBlob", () => {
     const svgDataUrl =
       "data:image/svg+xml;charset=utf-8," +
       encodeURIComponent(
-        '<svg viewBox="0 0 100 200"><rect x="10" y="10" width="80" height="180"/></svg>'
+        '<svg viewBox="0 0 100 200"><rect x="10" y="10" width="80" height="180"/></svg>',
       );
 
     const blob = await svgDataUrlToPngBlob(svgDataUrl, { padding: 10, scale: 2 });
@@ -68,7 +66,7 @@ describe("svgDataUrlToPngBlob", () => {
 
   it("無効なフォーマットのデータURLでエラーを投げること", async () => {
     await expect(svgDataUrlToPngBlob("invalid-url")).rejects.toThrow(
-      "無効なSVGデータURLフォーマットです。"
+      "無効なSVGデータURLフォーマットです。",
     );
   });
 });

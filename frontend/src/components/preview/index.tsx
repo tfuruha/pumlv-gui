@@ -31,4 +31,3 @@ export function Preview({ svg, fileName }: { svg: string; fileName?: string }): 
     </div>
   );
 }
-

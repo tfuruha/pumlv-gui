@@ -44,7 +44,7 @@ async function importFromPublic(url: string): Promise<PlantUMLModule> {
   const blob = new Blob([text], { type: "application/javascript" });
   const blobUrl = URL.createObjectURL(blob);
   try {
-    const mod = await import(/* @vite-ignore */ blobUrl) as PlantUMLModule;
+    const mod = (await import(/* @vite-ignore */ blobUrl)) as PlantUMLModule;
     return mod;
   } finally {
     URL.revokeObjectURL(blobUrl);
@@ -56,10 +56,7 @@ export async function loadPlantUMLModule(): Promise<PlantUMLModule> {
   ready = (async () => {
     // plantuml.js only touches globalThis.Graphviz from inside renderToString,
     // so we can fetch/parse both scripts in parallel.
-    const [, mod] = await Promise.all([
-      loadVizGlobal(),
-      importFromPublic(PLANTUML_MODULE_URL),
-    ]);
+    const [, mod] = await Promise.all([loadVizGlobal(), importFromPublic(PLANTUML_MODULE_URL)]);
     if (typeof mod.renderToString !== "function") {
       throw new Error("plantuml.js did not export renderToString");
     }

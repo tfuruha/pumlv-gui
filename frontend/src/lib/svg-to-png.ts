@@ -18,7 +18,7 @@ export const DEFAULT_SCALE = 3;
 
 export interface SvgToPngOptions {
   padding?: number; // 余白ピクセル
-  scale?: number;   // 解像度倍率
+  scale?: number; // 解像度倍率
 }
 
 /**
@@ -29,7 +29,7 @@ export interface SvgToPngOptions {
  */
 export async function svgDataUrlToPngBlob(
   svgDataUrl: string,
-  options: SvgToPngOptions = {}
+  options: SvgToPngOptions = {},
 ): Promise<Blob> {
   const padding = options.padding ?? DEFAULT_PADDING;
   const scale = options.scale ?? DEFAULT_SCALE;
@@ -103,15 +103,12 @@ export async function svgDataUrlToPngBlob(
 
   // 4. CanvasをPNG Blobに書き出し
   return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          resolve(blob);
-        } else {
-          reject(new Error("PNG Blobへの変換に失敗しました。"));
-        }
-      },
-      "image/png"
-    );
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("PNG Blobへの変換に失敗しました。"));
+      }
+    }, "image/png");
   });
 }
