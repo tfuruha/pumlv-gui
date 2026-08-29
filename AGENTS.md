@@ -98,7 +98,7 @@ pumlv-gui/
 - **Phase 1 (完了)**: pumlv の内部 HTTP サーバーをそのまま内蔵し、Wails WebView からアクセス
 - **Phase 2 (完了)**: HTTP サーバーを Wails バインディング + Events に置き換え、GUI 機能（DnD、メニュー、設定記憶、ドラッグによるファイルペイン幅調整・トグル）を実装
 - **外部連携機能追加 (完了)**: レンダリングされた図のクリップボードへのPNGコピー機能、およびネイティブダイアログ経由でのPNG保存機能を実装。Wordなどの外部ドキュメントへの貼り付け品質を考慮した高解像度（3xスケール）および見切れ防止白余白（12px）を導入。
-- **MIT Flavor 移行 (完了)**: `plantuml.js` の取得元を GPL 版 ZIP アーカイブから公式 npm パッケージ `@plantuml/core@1.2026.6` (MIT ライセンス) へ変更し、`scripts/vendor-plantuml-core.mjs` によるコピー＆パッチ（ダイアグラム制限を 65536px に引き上げ）へ切り替え。
+- **MIT Flavor 移行 (完了)**: `plantuml.js` の取得元を GPL 版 ZIP アーカイブから公式 npm パッケージ `@plantuml/core@1.2026.7` (MIT ライセンス) へ変更し、`scripts/vendor-plantuml-core.mjs` によるコピー＆パッチ（ダイアグラム制限を 65536px に引き上げ）へ切り替え。
 
 詳細は [PlansWalks/implementation_plan_260715.md](PlansWalks/implementation_plan_260715.md)、[PlansWalks/implementation_plan_export.md](PlansWalks/implementation_plan_export.md) および [PlansWalks/implementation_plan_mit_flavor.md](PlansWalks/implementation_plan_mit_flavor.md) を参照。
 
