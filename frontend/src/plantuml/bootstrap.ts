@@ -5,10 +5,16 @@
 const VIZ_URL = "/plantuml/viz-global.js";
 const PLANTUML_MODULE_URL = "/plantuml/plantuml.js";
 
+export interface RenderOptions {
+  maxSvgSize?: number;
+  dark?: boolean;
+}
+
 type RenderToString = (
   lines: string[],
   onSuccess: (svg: string) => void,
   onError: (message: string) => void,
+  options?: RenderOptions,
 ) => void;
 
 export interface PlantUMLModule {

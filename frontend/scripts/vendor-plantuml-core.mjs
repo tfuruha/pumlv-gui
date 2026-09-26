@@ -7,27 +7,28 @@ import { fileURLToPath } from "node:url";
 
 const REQUIRED_FILES = ["plantuml.js", "viz-global.js"];
 
-// エンジンが 4096px 超のレイアウトを拒否する制限をパッチする。
-// render/renderToString API にサイズオプションは存在せず、
-// scale/dpi プラグマも当該チェックには影響しないため、
-// ベンダーコピーへの直接パッチが唯一の解決策。
-const LIMIT_FROM = "4096.0";
-const LIMIT_TO = "65536.0";
-const LIMIT_OCCURRENCES = 2;
+// エンジンがデフォルト上限（v1.2026.8 では 8192px）超のレイアウトを拒否する制限をパッチする。
+const PATCH_RULES = [
+  { from: "AQx=8192;", to: "AQx=65536;", expected: 3 },
+  { from: "c<0)c=8192;", to: "c<0)c=65536;", expected: 1 },
+];
 
 function patchDimensionLimit(filePath) {
-  const src = readFileSync(filePath, "utf8");
-  const found = src.split(LIMIT_FROM).length - 1;
-  if (found !== LIMIT_OCCURRENCES) {
-    console.error(
-      `plantuml.js patch failed: "${LIMIT_FROM}" の出現数が ${LIMIT_OCCURRENCES} 個のはずが ${found} 個でした。\n` +
-        "アップストリームの TeaVM ビルドが変更された可能性があります。" +
-        "plantuml.js を確認し、vendor-plantuml-core.mjs を更新してください。",
-    );
-    process.exit(1);
+  let src = readFileSync(filePath, "utf8");
+  for (const { from, to, expected } of PATCH_RULES) {
+    const found = src.split(from).length - 1;
+    if (found !== expected) {
+      console.error(
+        `plantuml.js patch failed: "${from}" の出現数が ${expected} 個のはずが ${found} 個でした。\n` +
+          "アップストリームの TeaVM ビルドが変更された可能性があります。" +
+          "plantuml.js を確認し、vendor-plantuml-core.mjs を更新してください。",
+      );
+      process.exit(1);
+    }
+    src = src.replaceAll(from, to);
   }
-  writeFileSync(filePath, src.replaceAll(LIMIT_FROM, LIMIT_TO));
-  console.log(`plantuml.js: ダイアグラムサイズ制限を ${LIMIT_FROM} → ${LIMIT_TO} に引き上げました`);
+  writeFileSync(filePath, src);
+  console.log("plantuml.js: ダイアグラムサイズ制限を 65536 に引き上げました");
 }
 
 const here = dirname(fileURLToPath(import.meta.url));
