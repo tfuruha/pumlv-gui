@@ -49,7 +49,7 @@ CLI ツール [rin2yh/pumlv](https://github.com/rin2yh/pumlv) を [Wails v2](htt
 | Go | 1.23 以上 | |
 | Node.js | 20 以上 | |
 | Wails CLI | v2.12 以上 | `go install github.com/wailsapp/wails/v2/cmd/wails@latest` |
-| npm | — | `wails.json` 内で `npm` を使用（pnpm も可）|
+| Bun | 1.0 以上 | `wails.json` 内で `bun` を使用 |
 
 ---
 
@@ -79,7 +79,7 @@ wails build
 .\build-release.ps1
 
 # フロントエンドのみビルド
-cd frontend && npm run build
+cd frontend && bun run build
 
 # Go コードのビルド確認
 go build ./...
