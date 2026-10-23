@@ -7,9 +7,9 @@ import { fileURLToPath } from "node:url";
 
 const REQUIRED_FILES = ["plantuml.js", "viz-global.js"];
 
-// エンジンがデフォルト上限（v1.2026.8 では 8192px）超のレイアウトを拒否する制限をパッチする。
+// エンジンがデフォルト上限（8192px）超のレイアウトを拒否する制限をパッチする。
+// v1.2026.9 では options.maxSvgSize の未指定時デフォルト (8192) に一本化されている。
 const PATCH_RULES = [
-  { from: "AQx=8192;", to: "AQx=65536;", expected: 3 },
   { from: "c<0)c=8192;", to: "c<0)c=65536;", expected: 1 },
 ];
 
