@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@babel/core": "^8.1.2",
-    "@plantuml/core": "1.2026.9",
+    "@plantuml/core": "1.2026.10",
     "@playwright/test": "1.63.0",
     "@rolldown/plugin-babel": "^0.2.4",
     "@storybook/addon-vitest": "10.6.1",
